@@ -1,23 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+plugins {
+    id 'com.android.application' version '8.3.0'
+}
 
-    <uses-permission android:name="android.permission.INTERNET" />
+android {
+    namespace 'com.mychat.app'
+    compileSdk 34
 
-    <application
-        android:allowBackup="true"
-        android:label="Messenger"
-        android:icon="@android:drawable/sym_action_chat"
-        android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
+    defaultConfig {
+        applicationId "com.mychat.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17"
+            }
+        }
+    }
 
-    </application>
-</manifest>
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
