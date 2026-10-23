@@ -5,7 +5,7 @@
 
     <application
         android:allowBackup="true"
-        android:label="C++ Messenger"
+        android:label="Messenger"
         android:icon="@android:drawable/sym_action_chat"
         android:theme="@android:style/Theme.DeviceDefault.NoActionBar">
 
