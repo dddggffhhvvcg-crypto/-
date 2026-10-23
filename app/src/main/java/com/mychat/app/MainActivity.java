@@ -44,14 +44,14 @@ public class MainActivity extends Activity {
     public native String encryptPacket(String author, String message, String secretKey);
     public native String decryptPacket(String hexPacket, String secretKey);
 
-    private static final int COL_BG = Color.parseColor("#000000");
-    private static final int COL_CARD = Color.parseColor("#0F0F12");
-    private static final int COL_INPUT = Color.parseColor("#08080A");
-    private static final int COL_STROKE = Color.parseColor("#222228");
-    private static final int COL_ACCENT = Color.parseColor("#E8EAED");
-    private static final int COL_ACCENT_SOFT = Color.parseColor("#1F2026");
-    private static final int COL_TEXT_MAIN = Color.parseColor("#FFFFFF");
-    private static final int COL_TEXT_SUB = Color.parseColor("#7A7D85");
+    private static final int COL_BG = Color.parseColor("#050507");
+    private static final int COL_CARD = Color.parseColor("#121216");
+    private static final int COL_INPUT = Color.parseColor("#1A1A22");
+    private static final int COL_STROKE = Color.parseColor("#2A2A36");
+    private static final int COL_ACCENT = Color.parseColor("#FFFFFF");
+    private static final int COL_ACCENT_SOFT = Color.parseColor("#262633");
+    private static final int COL_TEXT_MAIN = Color.parseColor("#F4F4F6");
+    private static final int COL_TEXT_SUB = Color.parseColor("#8E8E9D");
 
     private SharedPreferences prefs;
     private FrameLayout rootContainer;
@@ -98,43 +98,43 @@ public class MainActivity extends Activity {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER_HORIZONTAL);
-        layout.setPadding(dp(22), dp(44), dp(22), dp(48));
+        layout.setPadding(dp(24), dp(48), dp(24), dp(48));
 
-        WaveBadgeView badge = new WaveBadgeView(this, "✦");
-        LinearLayout.LayoutParams badgeParams = new LinearLayout.LayoutParams(dp(140), dp(140));
-        badgeParams.bottomMargin = dp(16);
+        SmoothBadgeView badge = new SmoothBadgeView(this, "✦");
+        LinearLayout.LayoutParams badgeParams = new LinearLayout.LayoutParams(dp(130), dp(130));
+        badgeParams.bottomMargin = dp(20);
         layout.addView(badge, badgeParams);
 
         TextView title = new TextView(this);
-        title.setText("Создание аккаунта");
+        title.setText("Добро пожаловать");
         title.setTextColor(COL_TEXT_MAIN);
-        title.setTextSize(26);
+        title.setTextSize(28);
         title.setTypeface(Typeface.DEFAULT_BOLD);
         title.setGravity(Gravity.CENTER);
         layout.addView(title);
 
         TextView subtitle = new TextView(this);
-        subtitle.setText("Регистрация по Email через C++ ядро");
+        subtitle.setText("Создайте аккаунт для доступа к мессенджеру");
         subtitle.setTextColor(COL_TEXT_SUB);
         subtitle.setTextSize(14);
         subtitle.setGravity(Gravity.CENTER);
-        subtitle.setPadding(0, dp(6), 0, dp(26));
+        subtitle.setPadding(0, dp(6), 0, dp(32));
         layout.addView(subtitle);
 
         LinearLayout formCard = createCardContainer();
-        formCard.setPadding(dp(16), dp(18), dp(16), dp(18));
+        formCard.setPadding(dp(18), dp(20), dp(18), dp(20));
 
-        EditText nickEdit = createPillInput("Отображаемое имя", "");
+        EditText nickEdit = createPillInput("Ваше имя", "");
         LinearLayout.LayoutParams inParams1 = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        inParams1.bottomMargin = dp(12);
+        inParams1.bottomMargin = dp(14);
         formCard.addView(nickEdit, inParams1);
 
-        EditText emailEdit = createPillInput("Ваш Email", "");
+        EditText emailEdit = createPillInput("Электронная почта", "");
         emailEdit.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         LinearLayout.LayoutParams inParams2 = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        inParams2.bottomMargin = dp(12);
+        inParams2.bottomMargin = dp(14);
         formCard.addView(emailEdit, inParams2);
 
         EditText passEdit = createPillInput("Пароль (от 4 символов)", "");
@@ -144,16 +144,16 @@ public class MainActivity extends Activity {
 
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        cardParams.bottomMargin = dp(22);
+        cardParams.bottomMargin = dp(24);
         layout.addView(formCard, cardParams);
 
-        View sliderView = createSlideTrack("Потяните для регистрации", () -> {
+        View sliderView = createSlideTrack("Сдвиньте для входа", () -> {
             String nick = nickEdit.getText().toString().trim();
             String email = emailEdit.getText().toString().trim();
             String pass = passEdit.getText().toString().trim();
 
             if (nick.isEmpty()) {
-                Toast.makeText(this, "Укажите имя", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Пожалуйста, введите имя", Toast.LENGTH_SHORT).show();
                 return false;
             }
 
@@ -174,18 +174,8 @@ public class MainActivity extends Activity {
         });
 
         LinearLayout.LayoutParams sliderParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, dp(62));
-        sliderParams.bottomMargin = dp(20);
+                ViewGroup.LayoutParams.MATCH_PARENT, dp(64));
         layout.addView(sliderView, sliderParams);
-
-        LinearLayout infoCard = createCardContainer();
-        infoCard.addView(createTextSection("Защита аккаунта",
-                "Почта и пароль обрабатываются внутри нативной библиотеки C++ и превращаются в криптографический ключ."));
-        infoCard.addView(createDivider());
-        infoCard.addView(createTextSection("Приватные комнаты",
-                "Сообщения шифруются на устройстве до отправки в сеть."));
-        layout.addView(infoCard, new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         scroll.addView(layout);
         rootContainer.addView(scroll);
@@ -214,7 +204,7 @@ public class MainActivity extends Activity {
 
         GradientDrawable navBg = new GradientDrawable();
         navBg.setColor(COL_CARD);
-        navBg.setCornerRadius(dp(34));
+        navBg.setCornerRadius(dp(36));
         navBg.setStroke(dp(1), COL_STROKE);
         pillNav.setBackground(navBg);
 
@@ -228,28 +218,10 @@ public class MainActivity extends Activity {
         pillNav.addView(tabSettingsBtn);
         bottomBarRow.addView(pillNav);
 
-        TextView quickCircleBtn = new TextView(this);
-        quickCircleBtn.setText("🔑");
-        quickCircleBtn.setTextSize(17);
-        quickCircleBtn.setGravity(Gravity.CENTER);
-        GradientDrawable circleBg = new GradientDrawable();
-        circleBg.setColor(COL_CARD);
-        circleBg.setCornerRadius(dp(26));
-        circleBg.setStroke(dp(1), COL_STROKE);
-        quickCircleBtn.setBackground(circleBg);
-        quickCircleBtn.setOnClickListener(v -> {
-            switchTab(true);
-            if (roomKeyInput != null) roomKeyInput.requestFocus();
-        });
-
-        LinearLayout.LayoutParams circleParams = new LinearLayout.LayoutParams(dp(50), dp(50));
-        circleParams.leftMargin = dp(10);
-        bottomBarRow.addView(quickCircleBtn, circleParams);
-
         FrameLayout.LayoutParams navParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         navParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        navParams.bottomMargin = dp(18);
+        navParams.bottomMargin = dp(20);
         rootContainer.addView(bottomBarRow, navParams);
 
         if (!isPolling) {
@@ -261,7 +233,6 @@ public class MainActivity extends Activity {
     private void switchTab(boolean showChats) {
         pageChats.setVisibility(showChats ? View.VISIBLE : View.GONE);
         pageSettings.setVisibility(showChats ? View.GONE : View.VISIBLE);
-
         styleNavTab(tabChatsBtn, showChats);
         styleNavTab(tabSettingsBtn, !showChats);
     }
@@ -269,16 +240,16 @@ public class MainActivity extends Activity {
     private LinearLayout buildChatsPage() {
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(16), dp(26), dp(16), dp(88));
+        container.setPadding(dp(16), dp(28), dp(16), dp(96));
 
-        roomKeyInput = createPillInput("🔍  Ключ секретного канала...", "main_room");
+        roomKeyInput = createPillInput("🔍  Название или ключ чата...", "general");
         container.addView(roomKeyInput, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         chatScrollView = new ScrollView(this);
         LinearLayout.LayoutParams scrollParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f);
-        scrollParams.setMargins(0, dp(12), 0, dp(12));
+        scrollParams.setMargins(0, dp(14), 0, dp(14));
 
         chatMessagesLayout = new LinearLayout(this);
         chatMessagesLayout.setOrientation(LinearLayout.VERTICAL);
@@ -297,19 +268,19 @@ public class MainActivity extends Activity {
         inputRow.addView(messageInput, msgParams);
 
         TextView sendBtn = new TextView(this);
-        sendBtn.setText("→");
+        sendBtn.setText("↑");
         sendBtn.setTextColor(COL_BG);
-        sendBtn.setTextSize(22);
+        sendBtn.setTextSize(24);
         sendBtn.setTypeface(Typeface.DEFAULT_BOLD);
         sendBtn.setGravity(Gravity.CENTER);
 
         GradientDrawable sendBg = new GradientDrawable();
         sendBg.setColor(COL_ACCENT);
-        sendBg.setCornerRadius(dp(26));
+        sendBg.setCornerRadius(dp(28));
         sendBtn.setBackground(sendBg);
         sendBtn.setOnClickListener(v -> sendMessage());
 
-        inputRow.addView(sendBtn, new LinearLayout.LayoutParams(dp(52), dp(52)));
+        inputRow.addView(sendBtn, new LinearLayout.LayoutParams(dp(54), dp(54)));
         container.addView(inputRow);
 
         return container;
@@ -319,31 +290,19 @@ public class MainActivity extends Activity {
         ScrollView scroll = new ScrollView(this);
         LinearLayout container = new LinearLayout(this);
         container.setOrientation(LinearLayout.VERTICAL);
-        container.setPadding(dp(16), dp(26), dp(16), dp(96));
+        container.setPadding(dp(16), dp(28), dp(16), dp(100));
 
         String nick = prefs.getString("nick", "User");
         String email = prefs.getString("email", "user@mail.ru");
         String token = prefs.getString("token", "ID-0000");
 
-        TextView searchBar = new TextView(this);
-        searchBar.setText("🔍   Поиск в настройках");
-        searchBar.setTextColor(COL_TEXT_SUB);
-        searchBar.setTextSize(15);
-        searchBar.setPadding(dp(22), dp(15), dp(22), dp(15));
-        GradientDrawable searchBg = new GradientDrawable();
-        searchBg.setColor(COL_CARD);
-        searchBg.setCornerRadius(dp(30));
-        searchBg.setStroke(dp(1), COL_STROKE);
-        searchBar.setBackground(searchBg);
-        container.addView(searchBar);
-
         LinearLayout profileRow = new LinearLayout(this);
         profileRow.setOrientation(LinearLayout.HORIZONTAL);
         profileRow.setGravity(Gravity.CENTER_VERTICAL);
-        profileRow.setPadding(dp(6), dp(22), dp(6), dp(18));
+        profileRow.setPadding(dp(6), dp(16), dp(6), dp(20));
 
-        WaveBadgeView avatar = new WaveBadgeView(this, nick.substring(0, 1).toUpperCase());
-        profileRow.addView(avatar, new LinearLayout.LayoutParams(dp(62), dp(62)));
+        SmoothBadgeView avatar = new SmoothBadgeView(this, nick.substring(0, 1).toUpperCase());
+        profileRow.addView(avatar, new LinearLayout.LayoutParams(dp(64), dp(64)));
 
         LinearLayout profileInfo = new LinearLayout(this);
         profileInfo.setOrientation(LinearLayout.VERTICAL);
@@ -365,25 +324,11 @@ public class MainActivity extends Activity {
         profileRow.addView(profileInfo);
         container.addView(profileRow);
 
-        LinearLayout tokenBar = createCardContainer();
-        tokenBar.addView(createSettingsRow("🆔", "Крипто-ID аккаунта", token, "C++"));
-        container.addView(tokenBar);
-
-        addSectionTitle(container, "Безопасность и сеть");
-        LinearLayout secCard = createCardContainer();
-        secCard.addView(createSettingsRow("🔒", "Шифрование пакетов", "Потоковый XOR + контроль целостности", "Вкл"));
-        secCard.addView(createDivider());
-        secCard.addView(createSettingsRow("⚡", "Комната по умолчанию", "Смена ключа на вкладке чатов", null));
-        container.addView(secCard);
-
-        addSectionTitle(container, "Аккаунт и интерфейс");
         LinearLayout appCard = createCardContainer();
-        appCard.addView(createSettingsRow("🌑", "Тема оформления", "Чистый черный OLED фон", null));
+        appCard.addView(createSettingsRow("🆔", "Ваш ID", token, null));
         appCard.addView(createDivider());
-        appCard.addView(createSettingsRow("✉", "Почта входа", email, null));
-        appCard.addView(createDivider());
-
-        View logoutRow = createSettingsRow("🚪", "Выйти из аккаунта", "Очистить токен и сменить почту", null);
+        
+        View logoutRow = createSettingsRow("🚪", "Выйти из аккаунта", "Сменить профиль", null);
         logoutRow.setOnClickListener(v -> {
             prefs.edit().clear().apply();
             showEmailRegistrationScreen();
@@ -401,7 +346,7 @@ public class MainActivity extends Activity {
         String nick = prefs.getString("nick", "Anon");
 
         if (text.isEmpty()) return;
-        if (key.isEmpty()) key = "main_room";
+        if (key.isEmpty()) key = "general";
 
         messageInput.setText("");
         final String finalKey = key;
@@ -425,7 +370,7 @@ public class MainActivity extends Activity {
                 conn.disconnect();
             } catch (Exception e) {
                 mainHandler.post(() ->
-                        Toast.makeText(MainActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(MainActivity.this, "Ошибка отправки", Toast.LENGTH_SHORT).show()
                 );
             }
         });
@@ -440,7 +385,7 @@ public class MainActivity extends Activity {
                         continue;
                     }
                     String key = roomKeyInput.getText().toString().trim();
-                    if (key.isEmpty()) key = "main_room";
+                    if (key.isEmpty()) key = "general";
                     String room = getRoomChannel(key);
 
                     if (!room.equals(currentRoom)) {
@@ -449,7 +394,7 @@ public class MainActivity extends Activity {
                         mainHandler.post(() -> {
                             if (chatMessagesLayout != null) {
                                 chatMessagesLayout.removeAllViews();
-                                addMessageBubble("Система", "Канал зашифрован. ID: " + room, false);
+                                addMessageBubble("Чат", "Добро пожаловать в комнату!", false);
                             }
                         });
                     }
@@ -472,7 +417,7 @@ public class MainActivity extends Activity {
                                 String decrypted = decryptPacket(line.trim(), key);
                                 if (!decrypted.isEmpty()) {
                                     String[] parts = decrypted.split("::", 2);
-                                    String author = parts.length > 1 ? parts[0] : "Система";
+                                    String author = parts.length > 1 ? parts[0] : "Участник";
                                     String body = parts.length > 1 ? parts[1] : decrypted;
                                     boolean isMine = author.equals(myNick);
 
@@ -495,12 +440,12 @@ public class MainActivity extends Activity {
     private void addMessageBubble(String author, String body, boolean isMine) {
         LinearLayout bubble = new LinearLayout(this);
         bubble.setOrientation(LinearLayout.VERTICAL);
-        bubble.setPadding(dp(18), dp(12), dp(18), dp(12));
+        bubble.setPadding(dp(16), dp(12), dp(16), dp(12));
 
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(isMine ? COL_ACCENT_SOFT : COL_CARD);
-        bg.setCornerRadius(dp(22));
-        bg.setStroke(dp(1), isMine ? Color.parseColor("#383A42") : COL_STROKE);
+        bg.setCornerRadius(dp(20));
+        bg.setStroke(dp(1), isMine ? Color.parseColor("#3B3B4F") : COL_STROKE);
         bubble.setBackground(bg);
 
         TextView authorTv = new TextView(this);
@@ -526,22 +471,22 @@ public class MainActivity extends Activity {
         chatScrollView.post(() -> chatScrollView.fullScroll(ScrollView.FOCUS_DOWN));
     }
 
-    private class WaveBadgeView extends View {
+    private class SmoothBadgeView extends View {
         private final Paint shapePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Path wavePath = new Path();
+        private final Path path = new Path();
         private final String symbol;
 
-        public WaveBadgeView(Context context, String symbol) {
+        public SmoothBadgeView(Context context, String symbol) {
             super(context);
             this.symbol = symbol;
-            shapePaint.setColor(COL_ACCENT_SOFT);
+            shapePaint.setColor(COL_CARD);
             shapePaint.setStyle(Paint.Style.FILL);
 
             borderPaint.setColor(COL_STROKE);
             borderPaint.setStyle(Paint.Style.STROKE);
-            borderPaint.setStrokeWidth(dp(1));
+            borderPaint.setStrokeWidth(dp(1.5f));
 
             textPaint.setColor(COL_TEXT_MAIN);
             textPaint.setTextAlign(Paint.Align.CENTER);
@@ -553,33 +498,28 @@ public class MainActivity extends Activity {
             super.onDraw(canvas);
             float cx = getWidth() / 2f;
             float cy = getHeight() / 2f;
-            float baseRadius = Math.min(cx, cy) * 0.82f;
-            float waveAmp = baseRadius * 0.11f;
-            int waves = 12;
+            float r = Math.min(cx, cy) * 0.85f;
 
-            wavePath.reset();
-            int steps = 180;
-            for (int i = 0; i <= steps; i++) {
-                double angle = 2.0 * Math.PI * i / steps;
-                float r = baseRadius + (float) Math.sin(angle * waves) * waveAmp;
-                float x = cx + (float) (r * Math.cos(angle));
-                float y = cy + (float) (r * Math.sin(angle));
-                if (i == 0) wavePath.moveTo(x, y);
-                else wavePath.lineTo(x, y);
+            path.reset();
+            int points = 12;
+            for (int i = 0; i <= points * 10; i++) {
+                double angle = 2.0 * Math.PI * i / (points * 10);
+                float radius = r + (float) Math.sin(angle * points) * (r * 0.08f);
+                float x = cx + (float) (radius * Math.cos(angle));
+                float y = cy + (float) (radius * Math.sin(angle));
+                if (i == 0) path.moveTo(x, y);
+                else path.lineTo(x, y);
             }
-            wavePath.close();
-            canvas.drawPath(wavePath, shapePaint);
-            canvas.drawPath(wavePath, borderPaint);
+            path.close();
 
-            textPaint.setTextSize(baseRadius * 0.72f);
+            canvas.drawPath(path, shapePaint);
+            canvas.drawPath(path, borderPaint);
+
+            textPaint.setTextSize(r * 0.75f);
             Paint.FontMetrics fm = textPaint.getFontMetrics();
             float textY = cy - (fm.ascent + fm.descent) / 2f;
             canvas.drawText(symbol, cx, textY, textPaint);
         }
-    }
-
-    private interface SlideCallback {
-        boolean onSlideComplete();
     }
 
     private View createSlideTrack(String labelText, SlideCallback callback) {
@@ -633,7 +573,7 @@ public class MainActivity extends Activity {
                         return true;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
-                        if (v.getTranslationX() > maxSlide * 0.72f) {
+                        if (v.getTranslationX() > maxSlide * 0.75f) {
                             v.setTranslationX(maxSlide);
                             boolean ok = callback.onSlideComplete();
                             if (!ok) {
@@ -651,6 +591,10 @@ public class MainActivity extends Activity {
         });
 
         return track;
+    }
+
+    private interface SlideCallback {
+        boolean onSlideComplete();
     }
 
     private LinearLayout createCardContainer() {
@@ -672,7 +616,7 @@ public class MainActivity extends Activity {
         edit.setTextColor(COL_TEXT_MAIN);
         edit.setTextSize(15);
         edit.setSingleLine(true);
-        edit.setPadding(dp(22), dp(15), dp(22), dp(15));
+        edit.setPadding(dp(20), dp(16), dp(20), dp(16));
 
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(COL_INPUT);
@@ -682,52 +626,21 @@ public class MainActivity extends Activity {
         return edit;
     }
 
-    private View createTextSection(String titleText, String descText) {
-        LinearLayout block = new LinearLayout(this);
-        block.setOrientation(LinearLayout.VERTICAL);
-        block.setPadding(dp(18), dp(14), dp(18), dp(14));
-
-        TextView t = new TextView(this);
-        t.setText(titleText);
-        t.setTextColor(COL_TEXT_MAIN);
-        t.setTextSize(16);
-        t.setTypeface(Typeface.DEFAULT_BOLD);
-        block.addView(t);
-
-        TextView d = new TextView(this);
-        d.setText(descText);
-        d.setTextColor(COL_TEXT_SUB);
-        d.setTextSize(13);
-        d.setPadding(0, dp(4), 0, 0);
-        block.addView(d);
-        return block;
-    }
-
-    private void addSectionTitle(LinearLayout parent, String text) {
-        TextView header = new TextView(this);
-        header.setText(text);
-        header.setTextColor(COL_TEXT_SUB);
-        header.setTextSize(13);
-        header.setTypeface(Typeface.DEFAULT_BOLD);
-        header.setPadding(dp(12), dp(18), dp(12), dp(8));
-        parent.addView(header);
-    }
-
     private View createSettingsRow(String icon, String title, String subtitle, String pillText) {
         LinearLayout row = new LinearLayout(this);
         row.setOrientation(LinearLayout.HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(16), dp(15), dp(16), dp(15));
+        row.setPadding(dp(16), dp(16), dp(16), dp(16));
 
         TextView iconView = new TextView(this);
         iconView.setText(icon);
-        iconView.setTextSize(17);
+        iconView.setTextSize(18);
         iconView.setGravity(Gravity.CENTER);
         GradientDrawable iconBg = new GradientDrawable();
         iconBg.setColor(COL_ACCENT_SOFT);
         iconBg.setCornerRadius(dp(20));
         iconView.setBackground(iconBg);
-        row.addView(iconView, new LinearLayout.LayoutParams(dp(40), dp(40)));
+        row.addView(iconView, new LinearLayout.LayoutParams(dp(44), dp(44)));
 
         LinearLayout textCol = new LinearLayout(this);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -737,7 +650,7 @@ public class MainActivity extends Activity {
         TextView t = new TextView(this);
         t.setText(title);
         t.setTextColor(COL_TEXT_MAIN);
-        t.setTextSize(15);
+        t.setTextSize(16);
         t.setTypeface(Typeface.DEFAULT_BOLD);
         textCol.addView(t);
 
@@ -747,24 +660,10 @@ public class MainActivity extends Activity {
         s.setTextSize(13);
         textCol.addView(s);
 
-        if (pillText != null) {
-            TextView badge = new TextView(this);
-            badge.setText(pillText);
-            badge.setTextColor(COL_BG);
-            badge.setTextSize(12);
-            badge.setTypeface(Typeface.DEFAULT_BOLD);
-            badge.setPadding(dp(12), dp(5), dp(12), dp(5));
-            GradientDrawable bBg = new GradientDrawable();
-            bBg.setColor(COL_ACCENT);
-            bBg.setCornerRadius(dp(16));
-            badge.setBackground(bBg);
-            row.addView(badge);
-        }
-
         TextView arrow = new TextView(this);
-        arrow.setText("  ›");
+        arrow.setText("›");
         arrow.setTextColor(COL_TEXT_SUB);
-        arrow.setTextSize(20);
+        arrow.setTextSize(22);
         row.addView(arrow);
 
         return row;
@@ -782,17 +681,17 @@ public class MainActivity extends Activity {
         tab.setText(title);
         tab.setTextSize(14);
         tab.setTypeface(Typeface.DEFAULT_BOLD);
-        tab.setPadding(dp(20), dp(11), dp(20), dp(11));
+        tab.setPadding(dp(22), dp(12), dp(22), dp(12));
         styleNavTab(tab, active);
         return tab;
     }
 
     private void styleNavTab(TextView tab, boolean active) {
         GradientDrawable bg = new GradientDrawable();
-        bg.setCornerRadius(dp(26));
+        bg.setCornerRadius(dp(28));
         if (active) {
             bg.setColor(COL_ACCENT_SOFT);
-            bg.setStroke(dp(1), Color.parseColor("#343640"));
+            bg.setStroke(dp(1), Color.parseColor("#3B3B4F"));
             tab.setTextColor(COL_TEXT_MAIN);
         } else {
             bg.setColor(Color.TRANSPARENT);
@@ -801,7 +700,7 @@ public class MainActivity extends Activity {
         tab.setBackground(bg);
     }
 
-    private int dp(int value) {
+    private int dp(float value) {
         return (int) (value * getResources().getDisplayMetrics().density);
     }
 
