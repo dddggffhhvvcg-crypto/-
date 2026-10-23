@@ -33,7 +33,7 @@ std::string from_hex(const std::string& hex) {
 }
 
 std::string cipher_transform(const std::string& data, const std::string& key) {
-    std::string k = key.empty() ? "default_key" : key;
+    std::string k = key.empty() ? "secure_key" : key;
     std::string out = data;
     uint32_t seed = fnv1a_hash(k);
 
@@ -50,6 +50,8 @@ extern "C" {
 JNIEXPORT jstring JNICALL
 Java_com_mychat_app_MainActivity_registerEmailNative(JNIEnv* env, jobject /* this */,
                                                      jstring email, jstring password) {
+    if (!email || !password) return env->NewStringUTF("ERROR:Заполните все поля");
+    
     const char* cEmail = env->GetStringUTFChars(email, nullptr);
     const char* cPass = env->GetStringUTFChars(password, nullptr);
 
@@ -59,17 +61,15 @@ Java_com_mychat_app_MainActivity_registerEmailNative(JNIEnv* env, jobject /* thi
     env->ReleaseStringUTFChars(email, cEmail);
     env->ReleaseStringUTFChars(password, cPass);
 
-    size_t atPos = sEmail.find('@');
-    size_t dotPos = sEmail.find_last_of('.');
-    if (atPos == std::string::npos || dotPos == std::string::npos || atPos == 0 || dotPos <= atPos + 1 || dotPos >= sEmail.size() - 1) {
-        return env->NewStringUTF("ERROR:Некорректный формат Email");
+    if (sEmail.find('@') == std::string::npos || sEmail.length() < 5) {
+        return env->NewStringUTF("ERROR:Введите корректный Email");
     }
-    if (sPass.size() < 4) {
+    if (sPass.length() < 4) {
         return env->NewStringUTF("ERROR:Пароль должен быть от 4 символов");
     }
 
-    uint32_t h1 = fnv1a_hash("auth_" + sEmail + "_" + sPass);
-    uint32_t h2 = fnv1a_hash("token_salt_" + sPass + "_" + sEmail);
+    uint32_t h1 = fnv1a_hash("auth_" + sEmail);
+    uint32_t h2 = fnv1a_hash("salt_" + sPass);
 
     std::ostringstream oss;
     oss << "ID-" << std::uppercase << std::hex << std::setw(8) << std::setfill('0') << h1
@@ -79,32 +79,31 @@ Java_com_mychat_app_MainActivity_registerEmailNative(JNIEnv* env, jobject /* thi
 
 JNIEXPORT jstring JNICALL
 Java_com_mychat_app_MainActivity_getRoomChannel(JNIEnv* env, jobject /* this */, jstring roomKey) {
+    if (!roomKey) return env->NewStringUTF("chat_global");
     const char* rawKey = env->GetStringUTFChars(roomKey, nullptr);
     std::string key(rawKey ? rawKey : "global");
     env->ReleaseStringUTFChars(roomKey, rawKey);
 
-    uint32_t h1 = fnv1a_hash("room_" + key);
-    uint32_t h2 = fnv1a_hash("salt_" + key);
-
+    uint32_t h = fnv1a_hash("room_chan_" + key);
     std::ostringstream oss;
-    oss << "cppchat_" << std::hex << h1 << h2;
+    oss << "chat_" << std::hex << h;
     return env->NewStringUTF(oss.str().c_str());
 }
 
 JNIEXPORT jstring JNICALL
 Java_com_mychat_app_MainActivity_encryptPacket(JNIEnv* env, jobject /* this */,
                                                jstring author, jstring message, jstring secretKey) {
-    const char* cAuthor = env->GetStringUTFChars(author, nullptr);
-    const char* cMsg = env->GetStringUTFChars(message, nullptr);
-    const char* cKey = env->GetStringUTFChars(secretKey, nullptr);
+    const char* cAuthor = author ? env->GetStringUTFChars(author, nullptr) : "User";
+    const char* cMsg = message ? env->GetStringUTFChars(message, nullptr) : "";
+    const char* cKey = secretKey ? env->GetStringUTFChars(secretKey, nullptr) : "key";
 
-    std::string sAuthor(cAuthor ? cAuthor : "Anon");
-    std::string sMsg(cMsg ? cMsg : "");
-    std::string sKey(cKey ? cKey : "1234");
+    std::string sAuthor(cAuthor);
+    std::string sMsg(cMsg);
+    std::string sKey(cKey);
 
-    env->ReleaseStringUTFChars(author, cAuthor);
-    env->ReleaseStringUTFChars(message, cMsg);
-    env->ReleaseStringUTFChars(secretKey, cKey);
+    if (author) env->ReleaseStringUTFChars(author, cAuthor);
+    if (message) env->ReleaseStringUTFChars(message, cMsg);
+    if (secretKey) env->ReleaseStringUTFChars(secretKey, cKey);
 
     std::string payload = sAuthor + "::" + sMsg;
     uint32_t checksum = fnv1a_hash(payload);
@@ -119,21 +118,22 @@ Java_com_mychat_app_MainActivity_encryptPacket(JNIEnv* env, jobject /* this */,
 JNIEXPORT jstring JNICALL
 Java_com_mychat_app_MainActivity_decryptPacket(JNIEnv* env, jobject /* this */,
                                                jstring hexPacket, jstring secretKey) {
+    if (!hexPacket) return env->NewStringUTF("");
     const char* cHex = env->GetStringUTFChars(hexPacket, nullptr);
-    const char* cKey = env->GetStringUTFChars(secretKey, nullptr);
+    const char* cKey = secretKey ? env->GetStringUTFChars(secretKey, nullptr) : "key";
 
     std::string sHex(cHex ? cHex : "");
-    std::string sKey(cKey ? cKey : "1234");
+    std::string sKey(cKey ? cKey : "key");
 
     env->ReleaseStringUTFChars(hexPacket, cHex);
-    env->ReleaseStringUTFChars(secretKey, cKey);
+    if (secretKey) env->ReleaseStringUTFChars(secretKey, cKey);
 
     std::string rawEncrypted = from_hex(sHex);
     if (rawEncrypted.size() < 10) return env->NewStringUTF("");
 
     std::string decrypted = cipher_transform(rawEncrypted, sKey);
-    if (decrypted[8] != '|') {
-        return env->NewStringUTF("SYSTEM::🔒 Ошибка ключа шифрования");
+    if (decrypted.length() <= 9 || decrypted[8] != '|') {
+        return env->NewStringUTF("Система::⚠️ Ошибка расшифровки сообщения");
     }
 
     std::string expectedHashHex = decrypted.substr(0, 8);
@@ -143,7 +143,7 @@ Java_com_mychat_app_MainActivity_decryptPacket(JNIEnv* env, jobject /* this */,
     actualHash << std::hex << std::setw(8) << std::setfill('0') << fnv1a_hash(payload);
 
     if (expectedHashHex != actualHash.str()) {
-        return env->NewStringUTF("SYSTEM::🔒 Ошибка ключа шифрования");
+        return env->NewStringUTF("Система::⚠️ Неверный ключ комнаты");
     }
 
     return env->NewStringUTF(payload.c_str());
